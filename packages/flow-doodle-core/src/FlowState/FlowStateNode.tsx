@@ -1,9 +1,11 @@
 import React from 'react'
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FlowStateNodeContextTypeData {
 
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FlowStateNodeContextTypeView {
 
 }
@@ -17,7 +19,7 @@ const FlowStateNodeView = React.createContext<FlowStateNodeContextTypeView>()
 export const FlowStateNodeProvider = <D extends { _data: any, _view: any }>(
     {children, data}: React.PropsWithChildren<{
         data: D
-    }>
+    }>,
 ): React.ReactElement => {
     return <FlowStateNodeView.Provider value={data?._view}>
         <FlowStateNodeData.Provider value={data?._data}>
@@ -30,7 +32,7 @@ export type flowStateNodeSelector<D extends { _data: any, _view: any }, PD exten
 
 export const selectFlowState = <PD extends {}, D extends { _data: any, _view: any }, P extends PD = PD, RP extends Omit<P, keyof PD> = Omit<P, keyof PD>>(
     selector: flowStateNodeSelector<D, PD>,
-    Component: React.ComponentType<P>
+    Component: React.ComponentType<P>,
 ): React.ComponentType<RP> => {
     const NewComponent = (props: RP) => {
         const data = React.useContext(FlowStateNodeData)

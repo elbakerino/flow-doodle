@@ -1,4 +1,4 @@
-import { FlowState, FlowStateDataScopes, FlowStateView } from './FlowTypes'
+import { FlowState, FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowState/FlowTypes'
 
 export interface FlowLayer {
     id: string
@@ -9,9 +9,11 @@ export interface FlowLayerList {
     layers: FlowLayer[]
 }
 
-export const buildLayerList = <FSD extends FlowStateDataScopes, FV extends FlowStateView = FlowStateView, FS extends FlowState<FSD, FV> = FlowState<FSD, FV>>(viewList: FS['viewList']) => {
+export const buildLayerList = <FSD extends FlowStateDataScopes, FV extends FlowStateView = FlowStateView, FS extends FlowState<FSD, FV> = FlowState<FSD, FV>>(
+    viewList: FS['viewList'],
+): FlowLayerList => {
     const layerList: FlowLayerList = {
-        layers: []
+        layers: [],
     }
 
     viewList?.forEach(vi => {

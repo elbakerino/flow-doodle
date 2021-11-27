@@ -32,6 +32,7 @@
     },
     "devDependencies": {
         "@types/react": "^16.8.6 || ^17.0.0",
+        "@types/react-color": "^3.0.0",
         "react": "^16.12",
         "react-dom": "^16.12",
         "@flow-doodle/core": "*",
