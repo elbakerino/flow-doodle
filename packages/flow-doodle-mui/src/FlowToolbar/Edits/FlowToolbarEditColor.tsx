@@ -5,7 +5,7 @@ import React, { memo } from 'react'
 import FormLabel from '@material-ui/core/FormLabel'
 import Switch from '@material-ui/core/Switch'
 import Box from '@material-ui/core/Box'
-import { FlowStateDataScopes } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowStateDataScopes } from '@flow-doodle/core/FlowTypes'
 import { useNamedColors } from 'named-color-maps'
 import { FlowToolbarEditProps } from '../FlowToolbarEdit'
 
@@ -75,8 +75,6 @@ export const FlowToolbarEditColorBase = <FSD extends FlowStateDataScopes>(
             onChange={(color) => {
                 if(!selectedElement) return
                 updateView(
-                    // @ts-ignore
-                    selectedElement.type,
                     selectedElement.id,
                     (view) => ({
                         ...view,
@@ -95,8 +93,6 @@ export const FlowToolbarEditColorBase = <FSD extends FlowStateDataScopes>(
                     onChange={() => {
                         if(!selectedElement) return
                         updateView(
-                            // @ts-ignore
-                            selectedElement.type,
                             selectedElement.id,
                             (view) => ({
                                 ...view,

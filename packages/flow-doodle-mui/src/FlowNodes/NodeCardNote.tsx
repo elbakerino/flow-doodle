@@ -1,17 +1,17 @@
 import React, { memo } from 'react'
 import InputBase from '@material-ui/core/InputBase'
-import { useFlowActions } from '@flow-doodle/core/FlowState/FlowContext'
-import { FlowNodeType, FlowStateDataScopes, NodeData } from '@flow-doodle/core/FlowState/FlowTypes'
+import { useFlowActions } from '@flow-doodle/core/FlowContext'
+import { FlowNodeType, FlowStateDataScopes, FlowStateViewData, NodeData } from '@flow-doodle/core/FlowTypes'
 import { useResponsiveInput } from '@flow-doodle/core/FlowNodeHelper/useResponsiveInput'
 import { NodeTagOuter } from '@flow-doodle/mui/NodeTagOuter'
 import { NodeBox, NodeBoxContent } from '@flow-doodle/mui/FlowNodeBox'
 import MuiLink from '@material-ui/core/Link'
 import IcOpenInNew from '@material-ui/icons/OpenInNew'
 import { Box, Divider } from '@material-ui/core'
-//import { IconEmbed } from '../IconEmbed'
-//import { IconImg } from '../IconImg'
+import { Icon1Embed } from '@icon1/react'
 import { useNamedColors } from 'named-color-maps'
 import { handlePreventPaneKeyboardEvent } from '@flow-doodle/core/FlowNodeHelper/handlePreventPaneKeyboardEvent'
+import { IconImg } from '@flow-doodle/mui/IconImg'
 
 export interface NodeCardNoteData extends NodeData {
     label: string
@@ -22,7 +22,7 @@ export interface NodeCardNoteFlowStateDataScopes extends FlowStateDataScopes {
     card_note: NodeCardNoteData
 }
 
-export const NodeCardNoteContentBase: React.ComponentType<Omit<FlowNodeType<NodeCardNoteFlowStateDataScopes, 'card_note'>, 'position'> & {
+export const NodeCardNoteContentBase: React.ComponentType<FlowNodeType<NodeCardNoteFlowStateDataScopes, 'card_note', FlowStateViewData> & {
     colorMapId?: string
 }> = (
     {
@@ -35,9 +35,9 @@ export const NodeCardNoteContentBase: React.ComponentType<Omit<FlowNodeType<Node
     },
 ) => {
     const {getNamedColor} = useNamedColors(colorMapId)
-    const label = data?._data.label
-    const text = data?._data.text
-    const view = data?._view
+    const label = data?.data.label
+    const text = data?.data.text
+    const view = data?.view
     const fontSize = view?.fontSize || 1
     const {width, getWidth} = useResponsiveInput(
         label || '',
@@ -96,7 +96,7 @@ export const NodeCardNoteContentBase: React.ComponentType<Omit<FlowNodeType<Node
                                 fontSize: ((view?.fontSize || 1) * 2) + 'rem',
                                 color: activeIconColor,
                             }}>
-                            {/*view?.icon?.url ?
+                            {view?.icon?.url ?
                                 <IconImg
                                     src={view?.icon?.url}
                                     title={'Icon'}
@@ -104,13 +104,12 @@ export const NodeCardNoteContentBase: React.ComponentType<Omit<FlowNodeType<Node
                                     fontSize={'inherit'}
                                 /> :
                                 view?.icon?.name && view?.icon?.provider ?
-                                    <IconEmbed
+                                    <Icon1Embed
                                         provider={view?.icon?.provider}
                                         id={view?.icon?.name}
                                         fontSize={'inherit'}
                                         color={'inherit'}
-                                    /> : null*/}
-                            Ic
+                                    /> : null}
                         </span> : null}
                     <div style={{display: 'flex', flexGrow: 1, minWidth: inpWidth, overflow: 'auto'}}>
                         <InputBase
@@ -132,8 +131,7 @@ export const NodeCardNoteContentBase: React.ComponentType<Omit<FlowNodeType<Node
                             }}
                             onChange={(e) => {
                                 const value = e.target.value
-                                type && update(
-                                    type,
+                                type && update<typeof type>(
                                     id,
                                     data => ({
                                         ...data,
@@ -168,8 +166,7 @@ export const NodeCardNoteContentBase: React.ComponentType<Omit<FlowNodeType<Node
                         }}
                         onChange={(e) => {
                             const value = e.target.value
-                            type && update(
-                                type,
+                            type && update<typeof type>(
                                 id,
                                 data => ({
                                     ...data,

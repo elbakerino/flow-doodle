@@ -1,4 +1,4 @@
-import { FlowNodeViewOptions } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowNodeViewOptions } from '@flow-doodle/core/FlowTypes'
 
 export const calcPxByView = <V extends FlowNodeViewOptions>(view: V | undefined): number =>
     (view?.fontSize || 1) > 1 ? 2 :

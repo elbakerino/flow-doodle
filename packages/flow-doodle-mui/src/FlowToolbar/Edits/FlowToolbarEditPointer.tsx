@@ -6,9 +6,9 @@ import IcOff from '@material-ui/icons/HighlightOff'
 import IcArrowRight from '@material-ui/icons/ArrowRight'
 import IcArrowLeft from '@material-ui/icons/ArrowLeft'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
-import { FlowState, FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowNodeViewOptions, FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowTypes'
 import { FlowToolbarEditProps } from '../FlowToolbarEdit'
-import { FlowContextActionsType } from '@flow-doodle/core/FlowState/FlowContext'
+import { FlowContextActionsType } from '@flow-doodle/core/FlowContext'
 
 export const FlowToolbarEditPointer = <FSD extends FlowStateDataScopes>(
     {
@@ -53,8 +53,6 @@ export const FlowToolbarEditPointer = <FSD extends FlowStateDataScopes>(
                         onChange={(_e, v) => {
                             if(!selectedElement) return
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
@@ -138,7 +136,7 @@ export const FlowToolbarEditPointer = <FSD extends FlowStateDataScopes>(
     </Popover>
 }
 
-export const WidthSlider = <FSD extends FlowStateDataScopes, FV extends FlowStateView = FlowStateView, FS extends FlowState<FSD, FV> = FlowState<FSD, FV>, K extends keyof FSD = keyof FSD, ID extends string = string, FVD extends FS['view'][K][ID] = FS['view'][K][ID]>(
+export const WidthSlider = <FSD extends FlowStateDataScopes, FV extends FlowStateView = FlowStateView, K extends keyof FSD = keyof FSD, ID extends string = string>(
     {
         label,
         value,
@@ -151,7 +149,7 @@ export const WidthSlider = <FSD extends FlowStateDataScopes, FV extends FlowStat
         value: number
         type: K | undefined
         id: ID | undefined
-        updater: (viewData: FVD, value: number) => FVD
+        updater: (viewData: FlowNodeViewOptions, value: number) => FlowNodeViewOptions
         updateView: FlowContextActionsType<FSD, FV>['updateView']
     },
 ): React.ReactElement => {
@@ -169,9 +167,8 @@ export const WidthSlider = <FSD extends FlowStateDataScopes, FV extends FlowStat
                 onChange={(_e, v) => {
                     if(!type || !id) return
                     updateView(
-                        type,
                         id,
-                        (vd) => updater(vd as FVD, v as number),
+                        (vd) => updater(vd, v as number),
                     )
                 }}
             />

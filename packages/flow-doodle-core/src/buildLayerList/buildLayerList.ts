@@ -1,4 +1,4 @@
-import { FlowState, FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowState, FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowTypes'
 
 export interface FlowLayer {
     id: string

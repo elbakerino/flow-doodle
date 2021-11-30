@@ -1,8 +1,6 @@
-# React Simple Gestures
+# Flow Doodle: Core
 
-Hook to listen for simple touch and/or mouse gestures on components.
-
-Checkout [Demo, Docs + Source](https://github.com/elbakerino/flow-doodle) on GitHub.
+Checkout [flow-doodle](https://github.com/elbakerino/flow-doodle) on GitHub.
 
 ## Versions
 

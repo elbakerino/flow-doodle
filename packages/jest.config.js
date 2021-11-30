@@ -1,4 +1,4 @@
-const packages = ['flow-doodle-core'];
+const packages = ['flow-doodle-core', 'flow-doodle-mui'];
 
 const testMatches = []
 const testMatchesLint = []
@@ -23,7 +23,8 @@ const base = {
         '^.+\\.tsx?$': 'ts-jest',
     },*/
     moduleNameMapper: {
-        '^@flow-doodle(.*)$': '<rootDir>/flow-doodle/src$1',
+        '^@flow-doodle/core(.*)$': '<rootDir>/flow-doodle-core/src$1',
+        '^@flow-doodle/mui(.*)$': '<rootDir>/flow-doodle-mui/src$1',
     },
     moduleFileExtensions: [
         'ts',

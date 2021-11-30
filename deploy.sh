@@ -15,7 +15,7 @@ cd flow-doodle-core
 cp package.json build/ && cp package-lock.json build/ && cp README.md build/
 cd ../
 
-cd flow-doodle-react
+cd flow-doodle-mui
 cp package.json build/ && cp package-lock.json build/ && cp README.md build/
 cd ../
 

@@ -1,12 +1,19 @@
 import Popover from '@material-ui/core/Popover'
 import React, { memo } from 'react'
-import { Box, IconButton, Paper, TextField, Typography } from '@material-ui/core'
+import Box from '@material-ui/core/Box'
+import IconButton from '@material-ui/core/IconButton'
+import Paper from '@material-ui/core/Paper'
+import TextField from '@material-ui/core/TextField'
+import Typography from '@material-ui/core/Typography'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import { Icon1IconDetails } from '@icon1/core'
+import { Icon1Picker } from '@icon1/mui'
 import IcDelete from '@material-ui/icons/Delete'
-import { FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowTypes'
 import { FlowToolbarEditProps } from '../FlowToolbarEdit'
 import MuiLink from '@material-ui/core/Link'
 import IcSearch from '@material-ui/icons/Search'
-import { IconPicker } from '../../IconPicker'
 import IcColorize from '@material-ui/icons/ColorLens'
 import Button from '@material-ui/core/Button'
 import { BlockPicker } from 'react-color'
@@ -27,15 +34,15 @@ export const FlowToolbarEditIconBase = <FSD extends FlowStateDataScopes>(
         icon: FlowStateView['icon'] | undefined
         colorMapId?: string
         containerRef?: React.MutableRefObject<HTMLDivElement | null>
-    } & FlowToolbarEditProps<FSD>
+    } & FlowToolbarEditProps<FSD>,
 ): React.ReactElement => {
+    const [provider, setProvider] = React.useState<'simple-icons' | 'material-ui'>('simple-icons')
     const [showColor, setShowColor] = React.useState<undefined | Element>()
     const {palette, typography} = useTheme()
     const {getNamedColor, getColorsInHex} = useNamedColors(colorMapId)
     const [iconUrlInvalid, setIconUrlInvalid] = React.useState<boolean>(false)
     const [activeSearch, setActiveSearch] = React.useState('')
     const [iconSearch, setIconSearch] = React.useState<{
-        provider: string
         search: string
     } | undefined>()
 
@@ -55,20 +62,18 @@ export const FlowToolbarEditIconBase = <FSD extends FlowStateDataScopes>(
     // @ts-ignore
     const sType = selectedElement?.type
     const sId = selectedElement?.id
-    const onSelectIcon = React.useCallback(({provider, id, colorDefault}) => {
+    const onSelectIcon = React.useCallback((provider, icon: Icon1IconDetails) => {
         if(!sType || !sId) return
         updateView(
-            // @ts-ignore
-            sType,
             sId,
             (view) => ({
                 ...view,
-                icon: view.icon?.provider === provider && view.icon?.name === id ? undefined : {
-                    name: id,
+                icon: view.icon?.provider === provider && view.icon?.name === icon.id ? undefined : {
+                    name: icon.id,
                     provider: provider,
-                    color: colorDefault || view.icon?.color || undefined,
+                    color: icon.colorDefault || view.icon?.color || undefined,
                 },
-            })
+            }),
         )
     }, [updateView, sType, sId])
 
@@ -92,97 +97,83 @@ export const FlowToolbarEditIconBase = <FSD extends FlowStateDataScopes>(
     >
         <Paper elevation={1}>
             <Box p={1} style={{minWidth: 220}}>
-                {/*<Box mb={2} style={{display: 'flex', flexDirection: 'column'}}>
-                    <Typography style={{width: '100%'}}>
-                        Standard Icons
-                    </Typography>
-                    <TextField
-                        size={'small'}
-                        value={iconSearch?.provider === 'material-ui' ? iconSearch?.search || '' : ''}
-                        onFocus={() => setIconSearch(is => ({
-                            provider: 'material-ui',
-                            search: is?.provider === 'material-ui' ? is.search : '',
-                        }))}
-                        onChange={e => setIconSearch({
-                            provider: 'material-ui',
-                            search: e.target.value,
-                        })}
-                    />
-                    {iconSearch?.provider === 'material-ui' ? <IconPicker provider={'material-ui'}/> : null}
-                </Box>*/}
-                <Box mb={2} style={{display: 'flex', flexDirection: 'column'}}>
-                    <Typography style={{width: '100%'}}>
-                        Brand Icons
-                    </Typography>
+                <Box style={{display: 'flex', flexDirection: 'column'}}>
+                    <Select
+                        value={provider}
+                        onChange={(e) => setProvider(e.target.value as 'simple-icons' | 'material-ui')}
+                        fullWidth
+                    >
+                        <MenuItem value={'simple-icons'}>Brand Icons</MenuItem>
+                        <MenuItem value={'material-ui'}>Material UI</MenuItem>
+                    </Select>
+
                     <Typography style={{width: '100%'}} variant={'caption'}>
-                        {'powered by '}
-                        <MuiLink
+                        {'icons by '}
+                        {provider === 'simple-icons' ? <MuiLink
                             href={'https://simpleicons.org'}
                             color={'inherit'}
                             target={'_blank'} rel={'noopener noreferrer'}
-                        >simpleicons.org</MuiLink>
+                        >simpleicons.org</MuiLink> : null}
+                        {provider === 'material-ui' ? <MuiLink
+                            href={'https://material.io/icons'}
+                            color={'inherit'}
+                            target={'_blank'} rel={'noopener noreferrer'}
+                        >material.io</MuiLink> : null}
                     </Typography>
-
+                </Box>
+                <Box mb={2} style={{display: 'flex', flexDirection: 'column'}}>
                     <Box>
                         <TextField
                             size={'small'}
                             fullWidth
-                            value={iconSearch?.provider === 'simple-icons' ? iconSearch?.search || '' : ''}
-                            onFocus={() => setIconSearch(is => ({
-                                provider: 'simple-icons',
-                                search: is?.provider === 'simple-icons' ? is.search : '',
-                            }))}
+                            value={iconSearch?.search || ''}
                             onChange={e => setIconSearch({
-                                provider: 'simple-icons',
                                 search: e.target.value,
                             })}
                             InputProps={{
-                                endAdornment: <IcSearch/>
+                                endAdornment: <IcSearch/>,
                             }}
                         />
                     </Box>
 
-                    {iconSearch?.provider === 'simple-icons' ?
-                        <Box mt={2}>
-                            <IconPicker
-                                provider={'simple-icons'}
-                                selected={icon?.provider === 'simple-icons' ? icon?.name : undefined}
-                                search={activeSearch}
-                                onSelect={onSelectIcon}
-                            />
-                        </Box> : null}
-                    {iconSearch?.provider === 'simple-icons' || (icon?.provider === 'simple-icons' && icon?.color) ?
-                        <Box mt={iconSearch?.provider === 'simple-icons' ? 1 : 0}>
-                            <Box style={{display: 'flex'}}>
-                                <Button
-                                    size={'small'} fullWidth
-                                    onClick={(e) => setShowColor(e.currentTarget)}
-                                    endIcon={<IcColorize style={{color: getNamedColor(icon?.color)?.color || icon?.color}}/>}
-                                >
-                                    Color
-                                </Button>
-                                <Button
-                                    size={'small'} fullWidth
-                                    onClick={(e) => {
-                                        if(!selectedElement) return
-                                        updateView(
-                                            // @ts-ignore
-                                            selectedElement.type,
-                                            selectedElement.id,
-                                            (view) => ({
-                                                ...view,
-                                                icon: {
-                                                    ...(view.icon || {}),
-                                                    color: undefined,
-                                                },
-                                            })
-                                        )
-                                    }}
-                                >
-                                    Clear Color
-                                </Button>
-                            </Box>
-                        </Box> : null}
+                    <Box mt={2}>
+                        <Icon1Picker
+                            provider={provider}
+                            selected={icon?.provider === provider ? icon?.name : undefined}
+                            search={activeSearch}
+                            onSelect={onSelectIcon}
+                        />
+                    </Box>
+
+                    <Box mt={1}>
+                        <Box style={{display: 'flex'}}>
+                            <Button
+                                size={'small'} fullWidth
+                                onClick={(e) => setShowColor(e.currentTarget)}
+                                endIcon={<IcColorize style={{color: getNamedColor(icon?.color)?.color || icon?.color}}/>}
+                            >
+                                Color
+                            </Button>
+                            <Button
+                                size={'small'} fullWidth
+                                onClick={() => {
+                                    if(!selectedElement) return
+                                    updateView(
+                                        selectedElement.id,
+                                        (view) => ({
+                                            ...view,
+                                            icon: {
+                                                ...(view.icon || {}),
+                                                color: undefined,
+                                            },
+                                        }),
+                                    )
+                                }}
+                            >
+                                Clear Color
+                            </Button>
+                        </Box>
+                    </Box>
                 </Box>
 
                 <Popover
@@ -215,16 +206,14 @@ export const FlowToolbarEditIconBase = <FSD extends FlowStateDataScopes>(
                                     fontSize: typography.body2.fontSize,
                                     height: 'auto',
                                     border: '1px solid ' + palette.divider,
-                                }
-                            }
+                                },
+                            },
                         }}
                         colors={getColorsInHex().slice(3)}
                         width={'106px'}
                         onChange={(color) => {
                             if(!selectedElement) return
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
@@ -232,7 +221,7 @@ export const FlowToolbarEditIconBase = <FSD extends FlowStateDataScopes>(
                                         ...(view.icon || {}),
                                         color: getNamedColor(color.hex)?.name || color.hex,
                                     },
-                                })
+                                }),
                             )
                         }}
                     />
@@ -249,31 +238,27 @@ export const FlowToolbarEditIconBase = <FSD extends FlowStateDataScopes>(
                             if(!selectedElement) return
                             setIconUrlInvalid(!e.currentTarget.reportValidity())
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
                                     icon: {
-                                        url: e.target.value as string
+                                        url: e.target.value as string,
                                     },
-                                })
+                                }),
                             )
                         }}
                     />
 
                     <IconButton
                         size={'small'} style={{margin: 'auto 0 auto 8px'}}
-                        onClick={(e) => {
+                        onClick={() => {
                             if(!selectedElement) return
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
                                     icon: undefined,
-                                })
+                                }),
                             )
                         }}
                     >

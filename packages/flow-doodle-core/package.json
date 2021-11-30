@@ -27,12 +27,14 @@
         "@types/react": "^16.8.6 || ^17.0.0",
         "react": "^16.12",
         "react-dom": "^16.12",
-        "react-flow-renderer": "^9.6.0"
+        "react-flow-renderer": "^9.6.0",
+        "immutable": "^4.0.0"
     },
     "peerDependencies": {
         "react": "^16.8 || ^17.0",
         "@types/react": "^16.8.6 || ^17.0.0",
-        "react-flow-renderer": "^9.6.0"
+        "react-flow-renderer": "^9.6.0",
+        "immutable": "^4.0.0"
     },
     "peerDependenciesMeta": {
         "@types/react": {

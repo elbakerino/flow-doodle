@@ -1,7 +1,7 @@
 import React, { KeyboardEventHandler, MouseEvent as ReactMouseEvent, MouseEventHandler, ReactNode } from 'react'
 import ReactFlow, { Node, SnapGrid, Connection, Edge, Elements, useZoomPanHelper, useStore, useStoreActions } from 'react-flow-renderer'
-import { FlowContextProps, useFlowActions } from '@flow-doodle/core/FlowState/FlowContext'
-import { FlowState, FlowStateDataScopes, FlowStateView, FlowStateViewCombined, FlowStateViewData, FlowStateViewInternalOnly, FlowViewListEntryNode } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowContextProps, useFlowActions } from '@flow-doodle/core/FlowContext'
+import { FlowState, FlowStateDataScopes, FlowStateView, FlowStateViewCombined, FlowStateViewData, FlowStateViewInternalOnly, FlowViewListEntryNode } from '@flow-doodle/core/FlowTypes'
 import { OnEdgeUpdateFunc } from 'react-flow-renderer/dist/types'
 import { updateNodeView, createNode, updateConnection, createConnection, deleteConnectionById, deleteNodeById } from '@flow-doodle/core/FlowStateActionHandler'
 
@@ -41,7 +41,7 @@ export const FlowRenderer = <FSD extends FlowStateDataScopes, FV extends FlowSta
             if('source' in elem && 'target' in elem) {
                 setFlowState(fs => deleteConnectionById<FSD, FV>(fs, elem.id))
             } else if(elem.type) {
-                setFlowState(fs => deleteNodeById<FSD, FV>(fs, elem.type as keyof FSD, elem.id))
+                setFlowState(fs => deleteNodeById<FSD, FV>(fs, elem.id))
             }
         }))
     }, [setFlowState])
@@ -108,7 +108,6 @@ export const FlowRenderer = <FSD extends FlowStateDataScopes, FV extends FlowSta
                 nodes?.forEach(elem => {
                     fs = updateNodeView<FSD, FV>(
                         fs,
-                        elem.type as keyof FSD,
                         elem.id,
                         (view) => ({
                             ...view,
@@ -128,8 +127,8 @@ export const FlowRenderer = <FSD extends FlowStateDataScopes, FV extends FlowSta
             e.stopPropagation()
             const selectedElems = store.getState().selectedElements
             if(selectedElems?.length === 1) {
-                const {type, id} = selectedElems[0] as FlowStateViewInternalOnly
-                duplicate(type, id, 1, (_id, node) => {
+                const {id} = selectedElems[0] as FlowStateViewInternalOnly
+                duplicate(id, 1, (_id, node) => {
                     if(node) {
                         setSelectedElements([node])
                     }

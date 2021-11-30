@@ -4,30 +4,32 @@ import { NodeTagOuter } from '@flow-doodle/mui/NodeTagOuter'
 import IcSwitch from '@material-ui/icons/SwapHoriz'
 import { calcPxByView, calcPyByView } from '@flow-doodle/mui/FlowNodeBox/NodeBoxHelper'
 import { NodeSelectorContent, NodeSelectorContentProps } from '@flow-doodle/mui/FlowNodes/NodeSelectorContent'
-import { FlowStateViewData } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowNodeType, FlowStateDataScopes, FlowStateViewData } from '@flow-doodle/core/FlowTypes'
+import { NodeCardNoteData } from '@flow-doodle/mui/FlowNodes/NodeCardNote'
 
-export interface NodeSelectorProps<T extends string = '_selector'> {
+export interface NodeSelectorProps {
     isDragging: boolean
     selected: boolean
-    label: string | undefined
-    type: T
-    id: string
-    view?: FlowStateViewData
     NodeSelectorContent?: React.ComponentType<NodeSelectorContentProps>
 }
 
-export const NodeSelectorBase = <T extends string = '_selector'>(
+export interface NodeCardSelectorFlowStateDataScopes extends FlowStateDataScopes {
+    _selector: NodeCardNoteData
+}
+
+export const NodeSelectorBase: React.ComponentType<FlowNodeType<NodeCardSelectorFlowStateDataScopes, '_selector', FlowStateViewData> & NodeSelectorProps> = (
     {
         selected,
         isDragging,
         type,
         id,
-        view,
+        data,
         NodeSelectorContent: CustomNodeSelector,
-    }: NodeSelectorProps<T>,
+    },
 ): React.ReactElement => {
     // todo: replace with injectable FlowContext components
     const NodeSelectorComp = CustomNodeSelector || NodeSelectorContent
+    const view = data?.view
     return <NodeBox
         isDragging={isDragging}
     >

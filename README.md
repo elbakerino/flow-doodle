@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/elbakerino/flow-doodle/branch/main/graph/badge.svg?token=OX9UOZPMRF)](https://codecov.io/gh/elbakerino/flow-doodle)
 ![Typed](https://flat.badgen.net/badge/icon/Typed?icon=typescript&label&labelColor=blue&color=555555)
 
-...
+> scribble and experimenting
 
 ## Versions
 

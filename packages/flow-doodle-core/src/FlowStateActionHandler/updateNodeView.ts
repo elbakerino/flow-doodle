@@ -1,49 +1,21 @@
-import { FlowState, FlowStateDataScopes, FlowStateType, FlowStateView, FlowStateViewCombined, FlowViewListEntryNode } from '@flow-doodle/core/FlowState/FlowTypes'
-import { makeView } from './makeView'
+import { FlowNodeViewOptions, FlowState, FlowStateDataScopes, FlowStateType, FlowStateView } from '@flow-doodle/core/FlowTypes'
+import { getIndexFromId } from '@flow-doodle/core/FlowContext/getIndexFromId'
 
-export const updateNodeView = <FSD extends FlowStateDataScopes, FV extends FlowStateView, FS extends FlowState<FSD, FV> = FlowState<FSD, FV>, FST extends FlowStateType<FSD, FV, FS> = FlowStateType<FSD, FV, FS>, K extends keyof FSD = keyof FSD, ID extends keyof FS['view'][K] = keyof FS['view'][K], D extends FS['view'][K][ID] = FS['view'][K][ID]>(
+export const updateNodeView = <FSD extends FlowStateDataScopes, FV extends FlowStateView, FS extends FlowState<FSD, FV> = FlowState<FSD, FV>, FST extends FlowStateType<FSD, FV, FS> = FlowStateType<FSD, FV, FS>, FSO extends FlowNodeViewOptions = FlowNodeViewOptions>(
     fs: FST,
-    dataScope: K,
-    id: ID,
-    updater: (data: D) => D,
+    id: string,
+    updater: (data: FSO) => FSO,
 ): FST => {
-    const currentView = fs.get('view') as FS['view']
-    currentView[dataScope] = {...currentView[dataScope]}
-    currentView[dataScope][id] = {...currentView[dataScope][id]}
-    const currentViewItem = currentView[dataScope][id]
-    const updated = updater(currentViewItem as D)
-    currentView[dataScope][id] = updated
-    fs = fs.set('view', currentView)
-
+    const index = getIndexFromId<FSD, FV, FS, FST>(fs, id)
     fs = fs.update('viewList', viewList => {
-        const vl: FS['viewList'] = [...(viewList as FS['viewList']) || []]
-        const index = vl.findIndex(vi => vi.id === id)
-        const view = fs.get('view') as FS['view']
-        if(view && view[dataScope][id] && index !== -1) {
-            // todo: make this build the same as for the `view`/`viewList` update in the `createNode` function
-            // @ts-ignore
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {data, ...oldViewListCleaned} = (vl[index] && vl[index] ? vl[index] : {})
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {id: idT, type: typeT, ...p} = updated
-            const vli = vl[index] as FlowViewListEntryNode<FSD, FV>
-            vl.splice(
-                index, 1,
-                makeView<FSD, FV, FS>(
-                    dataScope,
-                    id as string,
-                    {
-                        ...oldViewListCleaned,
-                        ...('data' in vli ? {
-                            ...vli && vli.data?._view ? vli.data._view : view[dataScope][id],
-                        } : {}),
-                        ...p,
-                        // todo check typing
-                    } as unknown as Partial<FlowStateViewCombined<FV>>,
-                    fs.get('data') as FS['data'],
-                ),
-            )
-        }
+        const vl = [...(viewList as FS['viewList'] || [])] as FS['viewList']
+        (vl as FS['viewList']).splice(index, 1, {
+            ...vl[index],
+            data: {
+                ...vl[index].data,
+                view: updater(vl[index].data.view),
+            },
+        })
 
         return vl
     })

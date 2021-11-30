@@ -4,14 +4,16 @@ import { CircularProgress } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
 import IcCheck from '@material-ui/icons/Check'
 import React from 'react'
+import { useFlowState } from '@flow-doodle/core/FlowContext'
+import { FlowState, FlowStateDataScopes, FlowStateType, FlowStateView } from '@flow-doodle/core/FlowTypes'
 
-export const FlowToolbarSave: React.ComponentType<{
-    save: () => void
-}> = (
-    //{save}
-) => {
-    //const flowState = useFlowState<FlowStateDataScopes>()
-    const [saving/*, setSaving*/] = React.useState<number>(0)
+export const FlowToolbarSave = <FSD extends FlowStateDataScopes = FlowStateDataScopes, FV extends FlowStateView = FlowStateView, FS extends FlowState<FSD, FV> = FlowState<FSD, FV>, FST extends FlowStateType<FSD, FV, FS> = FlowStateType<FSD, FV, FS>>(
+    {save}: {
+        save: (fs: FST) => Promise<boolean>
+    },
+): React.ReactElement => {
+    const flowState = useFlowState<FSD, FV, FS, FST>()
+    const [saving, setSaving] = React.useState<number>(0)
     return <>
         <Box
             // this sizing enforces a safe zone around SAVE, so no chart interaction happens unseens just before saving
@@ -28,22 +30,8 @@ export const FlowToolbarSave: React.ComponentType<{
                 size={'medium'} style={{marginTop: 4}}
                 disabled={saving === 1 || saving === 2}
                 onClick={() => {
-                    /*if(!activeTable) return
                     setSaving(1)
-                    const {entity, ...data} = (flowState.get('data') as DesignerFlowState['data'])
-                    save(activeTable, {
-                        // @ts-ignore
-                        entities: {
-                            entity_definitions: (flowState.get('data') as DesignerFlowState['data']).entity,
-                            // @ts-ignore
-                            flow_cards: data,
-                            flow_view: (flowState.get('view') as DesignerFlowState['view']),
-                            // todo: add `buildLayerFromViewList` and respective support in `buildViewList` for reverting
-                            //flow_layers: (flowState.get('view') as DesignerFlowState['viewList']),
-                            flow_connections: (flowState.get('connections') as DesignerFlowState['connections']),
-                            flow_layers: buildLayerList(flowState.get('viewList') as DesignerFlowState['viewList']),
-                        }
-                    }).then((res) => {
+                    save(flowState).then((res) => {
                         if(res) {
                             setSaving(2)
                             window.setTimeout(() => {
@@ -52,7 +40,7 @@ export const FlowToolbarSave: React.ComponentType<{
                         } else {
                             setSaving(3)
                         }
-                    })*/
+                    })
                 }}
             >save</Button>
 

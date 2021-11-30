@@ -1,4 +1,4 @@
-import { FlowNodeViewOptions } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowNodeViewOptions } from '@flow-doodle/core/FlowTypes'
 
 export const calcPyByView = <V extends FlowNodeViewOptions>(view: V | undefined): number =>
     view?.fontSize === 0.85 ? 0.125 :

@@ -1,6 +1,6 @@
 import React from 'react'
 import { fromJS, Map } from 'immutable'
-import { FlowStateDataScopes, FlowStateType } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowStateDataScopes, FlowStateType } from '@flow-doodle/core/FlowTypes'
 
 export interface FlowHistoryContextType {
     hasFuture: boolean
@@ -91,18 +91,13 @@ export const useFlowHistoryMaker = <FSD extends FlowStateDataScopes, FS extends 
                 window.clearTimeout(timer.current)
                 hs = {...hs}
                 const h = hs.versions[hs.versions.length - 1]
+                // todo: this full immutable conversion may impact performance for bigger flows
                 const fullMapFs = Map(fromJS(fs.toObject()))
                 const fullMapFsV = h && Map(fromJS(h.toObject()))
                 const same = fullMapFsV && fullMapFs.equals(fullMapFsV)
                 if(same) {
                     return hs
                 }
-                // @ts-ignore
-                const isDataSame: boolean = fullMapFs.get('data')?.equals(fullMapFsV.get('data')) &&
-                    // @ts-ignore
-                    fullMapFs.get('connections')?.equals(fullMapFsV.get('connections'))
-                // @ts-ignore
-                const isViewSame: boolean = fullMapFs.get('view')?.equals(fullMapFsV.get('view'))
                 let didReset = false
                 hs.versions = [...hs.versions]
                 if(hs.versions.length > 0 && hs.versions.length - 1 > hs.inHistory) {
@@ -111,7 +106,7 @@ export const useFlowHistoryMaker = <FSD extends FlowStateDataScopes, FS extends 
                     hs.versions.splice(0, 10)
                     hs.inHistory = hs.versions.length - 1
                 }
-                if(didReset || (!isViewSame && isDataSame)) {
+                if(didReset) {
                     historyChangeRater.current.current = 0
                     historyChangeRater.current.last = fs
                     historyDebounce.current = []

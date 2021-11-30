@@ -12,17 +12,19 @@ import IcLink from '@material-ui/icons/Link'
 import IcLinkOff from '@material-ui/icons/LinkOff'
 import IcArticle from '@material-ui/icons/Stop'
 import IcLabel from '@material-ui/icons/Label'
-//import IcEmoticon from '@material-ui/icons/InsertEmoticon'
+import IcEmoticon from '@material-ui/icons/InsertEmoticon'
 //import IcLabelImportant from '@material-ui/icons/LabelImportant'
 //import IcMore from '@material-ui/icons/More'
 import React, { memo } from 'react'
 import { FlowElement, useStore, useStoreState } from 'react-flow-renderer'
-import { useFlowActions, useFlowState } from '@flow-doodle/core/FlowState/FlowContext'
-import { FlowStateDataScopes, FlowStateView, FlowStateViewInternalOnly } from '@flow-doodle/core/FlowState/FlowTypes'
+import { useFlowActions, useFlowState } from '@flow-doodle/core/FlowContext'
+import { FlowNodeInternalStateData, FlowStateDataScopes, FlowStateView, FlowStateViewInternalOnly } from '@flow-doodle/core/FlowTypes'
 import { FlowToolbarEditColor } from '../Edits/FlowToolbarEditColor'
 import { FlowToolbarEditLink } from '../Edits/FlowToolbarEditLink'
 import { FlowToolbarEditPointer } from '../Edits/FlowToolbarEditPointer'
 import { useSimpleGestures } from 'react-simple-gestures'
+import { FlowToolbarEditIcon } from '@flow-doodle/mui/FlowToolbar/Edits/FlowToolbarEditIcon'
+import { getIndexFromId } from '@flow-doodle/core/FlowContext/getIndexFromId'
 
 export const FlowToolbarNode: React.ComponentType<{}> = () => {
     const flowState = useFlowState<FlowStateDataScopes>()
@@ -32,7 +34,6 @@ export const FlowToolbarNode: React.ComponentType<{}> = () => {
     const selectedElements = useStoreState(s => s.selectedElements)
     React.useEffect(() => {
         if(selectedElements?.length === 1) {
-            // @ts-ignore
             const {id, type} = selectedElements[0]
             setSelectedElement(selectedElements[0])
             const lastType = type
@@ -52,7 +53,18 @@ export const FlowToolbarNode: React.ComponentType<{}> = () => {
         }
     }, [store, selectedElements, setSelectedElement])
 
-    const currentView = (selectedElement ? flowState.getIn(['view', selectedElement.type, selectedElement.id]) : undefined) as (FlowStateView & FlowStateViewInternalOnly) | undefined
+
+    let index
+    try {
+        if(selectedElement) {
+            index = getIndexFromId(flowState, selectedElement.id)
+        }
+    } catch(e) {
+        console.error(e)
+    }
+    const currentView = (selectedElement && typeof index !== 'undefined' ?
+        (flowState.getIn(['viewList', index]) as FlowNodeInternalStateData<FlowStateDataScopes>)?.data?.view :
+        undefined) as (FlowStateView & FlowStateViewInternalOnly) | undefined
     const {breakpoints} = useTheme()
     const isMd = useMediaQuery(breakpoints.up('md'))
 
@@ -82,10 +94,10 @@ const FlowToolbarNodeBase: React.ComponentType<{
     const [sideTagClicked, setSideTagClicked] = React.useState<boolean>(false)
     const [colorPickerId, setColorPickerId] = React.useState<undefined | Element>()
     const [showEditColor, setShowEditColor] = React.useState<undefined | Element>()
-    //const [showEditIcon, setShowEditIcon] = React.useState<undefined | Element>()
+    const [showEditIcon, setShowEditIcon] = React.useState<undefined | Element>()
     const [showEditPointer, setShowEditPointer] = React.useState<undefined | Element>()
     const btnRef = React.useRef(null)
-    //const btnLinkRef = React.useRef(null)
+    const btnLinkRef = React.useRef(null)
     const btnIconRef = React.useRef(null)
     const btnPointerRef = React.useRef(null)
     const {palette} = useTheme()
@@ -194,8 +206,6 @@ const FlowToolbarNodeBase: React.ComponentType<{
                             style={{minWidth: 30, marginBottom: 4}}
                             onClick={() => {
                                 updateView(
-                                    // @ts-ignore
-                                    selectedElement.type,
                                     selectedElement.id,
                                     (view) => ({
                                         ...view,
@@ -211,8 +221,6 @@ const FlowToolbarNodeBase: React.ComponentType<{
                         style={{minWidth: 30, marginBottom: 4}}
                         onClick={() => {
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
@@ -240,11 +248,11 @@ const FlowToolbarNodeBase: React.ComponentType<{
                         onClick={(e) => setShowEditColor(e.currentTarget)}
                     >{currentView?.link?.target ? <IcLinkOff/> : <IcLink/>}</Button>
 
-                    {/*<Button
+                    <Button
                         innerRef={btnLinkRef}
                         style={{minWidth: 30, marginBottom: 4}}
                         onClick={(e) => setShowEditIcon(e.currentTarget)}
-                    ><IcEmoticon/></Button>*/}
+                    ><IcEmoticon/></Button>
 
                     <Button
                         style={{
@@ -253,8 +261,6 @@ const FlowToolbarNodeBase: React.ComponentType<{
                         }}
                         onClick={() => {
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
@@ -318,7 +324,7 @@ const FlowToolbarNodeBase: React.ComponentType<{
                     updateView={updateView}
                     containerRef={containerRef}
                 />
-                {/*<FlowToolbarEditIcon
+                <FlowToolbarEditIcon
                     icon={currentView?.icon}
                     showEdit={showEditIcon}
                     setShowEdit={setShowEditIcon}
@@ -326,7 +332,7 @@ const FlowToolbarNodeBase: React.ComponentType<{
                     selectedElement={selectedElement}
                     updateView={updateView}
                     containerRef={containerRef}
-                />*/}
+                />
             </Box>
         </Paper>
     </>

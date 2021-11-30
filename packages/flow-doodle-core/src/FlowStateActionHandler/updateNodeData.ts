@@ -1,47 +1,21 @@
-import { FlowState, FlowStateDataScopes, FlowStateType, FlowStateView } from '@flow-doodle/core/FlowState/FlowTypes'
-import { makeView } from './makeView'
+import { FlowState, FlowStateDataScopes, FlowStateType, FlowStateView } from '@flow-doodle/core/FlowTypes'
+import { getIndexFromId } from '@flow-doodle/core/FlowContext/getIndexFromId'
 
 export const updateNodeData = <FSD extends FlowStateDataScopes, FV extends FlowStateView, FS extends FlowState<FSD, FV> = FlowState<FSD, FV>, FST extends FlowStateType<FSD, FV, FS> = FlowStateType<FSD, FV, FS>, K extends keyof FSD = keyof FSD>(
     fs: FST,
-    dataScope: K,
     id: string,
     updater: (data: FSD[K]) => FSD[K],
 ): FST => {
-    fs = fs.update('data', (data) => {
-        const d = {...data} as FS['data']
-        d[dataScope] = {...d[dataScope] || {}}
-        // @ts-ignore
-        d[dataScope][id] = {
-            ...d[dataScope][id],
-            // @ts-ignore
-            data: updater(d[dataScope][id].data || {}),
-        }
-        return d
-    })
-
+    const index = getIndexFromId<FSD, FV, FS, FST>(fs, id)
     fs = fs.update('viewList', viewList => {
-        const vl = [...(viewList as FS['viewList']) || []] as FS['viewList']
-        const index = vl.findIndex(vi => vi.id === id)
-        const view = fs.get('view') as FS['view']
-        if(view && view[dataScope][id] && index !== -1) {
-            // todo: make this build the same as for the `view`/`viewList` update in the `createNode` function, but without cleaning
-            // @ts-ignore
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {data, ...oldViewListCleaned} = (vl[index] && vl[index] ? vl[index] : {})
-            vl.splice(
-                index, 1,
-                makeView<FSD, FV, FS>(
-                    dataScope,
-                    id,
-                    {
-                        ...oldViewListCleaned,
-                        // @ts-ignore
-                        ...vl[index] && vl[index].data?._view ? vl[index].data._view : view[dataScope][id],
-                    },
-                    fs.get('data') as FS['data'],
-                ),
-            )
-        }
+        const vl = [...(viewList as FS['viewList'] || [])] as FS['viewList']
+        (vl as FS['viewList']).splice(index, 1, {
+            ...vl[index],
+            data: {
+                ...vl[index].data,
+                data: updater(vl[index].data.data),
+            },
+        })
 
         return vl
     })

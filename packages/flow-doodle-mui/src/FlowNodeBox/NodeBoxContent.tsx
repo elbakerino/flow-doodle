@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box'
 import Paper from '@material-ui/core/Paper'
 import useTheme from '@material-ui/core/styles/useTheme'
 import { NamedColorMapEntry, useNamedColors } from 'named-color-maps'
-import { FlowStateView } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowStateView } from '@flow-doodle/core/FlowTypes'
 import { NodeBoxContentPointer } from './NodeBoxContentPointer'
 import Badge from '@material-ui/core/Badge'
 

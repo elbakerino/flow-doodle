@@ -34,7 +34,7 @@
         "cross-env": "^6.0.3",
         "deployer-buddy": "^0.1.2",
         "lerna": "^3.22.1",
-        "lerna-packer": "0.3.0",
+        "lerna-packer": "0.3.1",
         "merge-dirs": "^0.2.1",
         "process": "^0.11.10",
         "rimraf": "^2.7.1",

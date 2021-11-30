@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { FlowRenderer, FlowRendererProps } from '@flow-doodle/core/FlowRenderer'
-import { FlowState, FlowStateDataScopes, FlowStateType, FlowStateView, FlowStateViewData } from '@flow-doodle/core/FlowState/FlowTypes'
-import { FlowContextProvider } from '@flow-doodle/core/FlowState/FlowContext'
+import { FlowState, FlowStateDataScopes, FlowStateType, FlowStateView } from '@flow-doodle/core/FlowTypes'
+import { FlowContextProvider } from '@flow-doodle/core/FlowContext'
 import { EdgeTypesType } from 'react-flow-renderer'
 import { EdgeInteractive } from '@flow-doodle/mui/FlowEdges/EdgeInteractive'
 import { FlowToolbar } from '@flow-doodle/mui/FlowToolbar/FlowToolbar'
@@ -17,13 +17,12 @@ import { NodeCardLabel, NodeCardLabelFlowStateDataScopes } from '@flow-doodle/mu
 import { NodeCardNote, NodeCardNoteFlowStateDataScopes } from '@flow-doodle/mui/FlowNodes/NodeCardNote'
 import { parseHandleId } from '@flow-doodle/core/FlowNodeHelper/parseHandleId'
 import { NodeSelector } from '@flow-doodle/mui/FlowNodes/NodeSelector'
-import { Map } from 'immutable'
 
-export interface DesignerFlowStateDataScopes extends FlowStateDataScopes, NodeCardLabelFlowStateDataScopes, NodeCardNoteFlowStateDataScopes {
+export interface CustomFlowStateDataScopes extends FlowStateDataScopes, NodeCardLabelFlowStateDataScopes, NodeCardNoteFlowStateDataScopes {
     //entity: NodeEntityData
 }
 
-const nodeTypes: FlowRendererProps<DesignerFlowStateDataScopes>['nodeTypes'] = {
+const nodeTypes: FlowRendererProps<CustomFlowStateDataScopes>['nodeTypes'] = {
     _selector: NodeSelector,
     card_label: NodeCardLabel,
     card_note: NodeCardNote,
@@ -33,7 +32,7 @@ const edgeTypes: EdgeTypesType = {
     default: EdgeInteractive,
 }
 
-const getEdgeType: FlowRendererProps<DesignerFlowStateDataScopes>['getEdgeType'] = (connection) => {
+const getEdgeType: FlowRendererProps<CustomFlowStateDataScopes>['getEdgeType'] = (connection) => {
     const {action: sourceHandleAction, type: sourceHandleType} = parseHandleId(connection.sourceHandle) || {}
     const {type: targetHandleType} = parseHandleId(connection.targetHandle) || {}
     if(sourceHandleType === '_prop' && targetHandleType === '_prop') {
@@ -44,16 +43,18 @@ const getEdgeType: FlowRendererProps<DesignerFlowStateDataScopes>['getEdgeType']
     return 'default'
 }
 
-export type DesignerFlowState = FlowState<DesignerFlowStateDataScopes>
-export type DesignerFlowStateType = FlowStateType<DesignerFlowStateDataScopes>
+export type CustomFlowState = FlowState<CustomFlowStateDataScopes>
+export type CustomFlowStateType = FlowStateType<CustomFlowStateDataScopes>
 
 const shadedColors = {green, grey}
 
 const colorMaps = {
     flow_box: flowBoxContentColorMap,
 }
-const save = () => {
-    return null
+
+const save = (fs: any) => {
+    console.log(fs?.toJS())
+    return Promise.resolve(true)
 }
 
 export const FlowDoodle: React.ComponentType<{
@@ -63,19 +64,11 @@ export const FlowDoodle: React.ComponentType<{
         contentContainerRef,
     },
 ) => {
-    const [flowState, setFlowStateState] = React.useState<DesignerFlowStateType>(() =>
-        buildViewList<DesignerFlowStateDataScopes, FlowStateViewData>(
-            {layers: []},
-            Map<keyof DesignerFlowState, DesignerFlowState[keyof DesignerFlowState]>({
-                data: {},
-                view: {},
-                viewList: [],
-                connections: [],
-            }),
-        ),
+    const [flowState, setFlowStateState] = React.useState<CustomFlowStateType>(() =>
+        buildViewList<CustomFlowStateDataScopes>([]),
     )
 
-    const {setFlowState, ...history} = useFlowHistoryMaker<DesignerFlowStateDataScopes>(setFlowStateState, flowState)
+    const {setFlowState, ...history} = useFlowHistoryMaker<CustomFlowStateDataScopes>(setFlowStateState, flowState)
 
     const {palette} = useTheme()
 
@@ -88,6 +81,7 @@ export const FlowDoodle: React.ComponentType<{
         success: palette.success,
         background: palette.background,
     }), [palette])
+
     console.log(flowState.toJS())
 
     return <NamedColorsProvider
@@ -96,7 +90,7 @@ export const FlowDoodle: React.ComponentType<{
         palette={colorPalette}
     >
         <FlowHistoryProvider {...history}>
-            <FlowContextProvider<DesignerFlowStateDataScopes>
+            <FlowContextProvider<CustomFlowStateDataScopes>
                 update={setFlowState}
                 flowState={flowState}
                 container={contentContainerRef}
@@ -104,10 +98,10 @@ export const FlowDoodle: React.ComponentType<{
                 <FlowToolbarProvider>
                     <FlowToolbar save={save}/>
                     <FlowNoticer
-                        showEmptyNotice={((flowState?.get('viewList') as DesignerFlowState['viewList'])?.length || 0) < 1}
+                        showEmptyNotice={((flowState?.get('viewList') as CustomFlowState['viewList'])?.length || 0) < 1}
                     />
-                    <EnhancedFlowRenderer<DesignerFlowStateDataScopes>
-                        viewList={flowState.get('viewList') as DesignerFlowState['viewList']}
+                    <EnhancedFlowRenderer<CustomFlowStateDataScopes>
+                        viewList={flowState.get('viewList') as CustomFlowState['viewList']}
                         setFlowState={setFlowState}
                         nodeTypes={nodeTypes}
                         edgeTypes={edgeTypes}

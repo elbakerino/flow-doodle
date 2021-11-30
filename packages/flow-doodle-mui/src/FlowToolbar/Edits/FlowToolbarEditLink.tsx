@@ -2,7 +2,7 @@ import Popover from '@material-ui/core/Popover'
 import React from 'react'
 import { Box, IconButton, Paper, TextField, Typography } from '@material-ui/core'
 import IcDelete from '@material-ui/icons/Delete'
-import { FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowState/FlowTypes'
+import { FlowStateDataScopes, FlowStateView } from '@flow-doodle/core/FlowTypes'
 import { FlowToolbarEditProps } from '../FlowToolbarEdit'
 
 export const FlowToolbarEditLink = <FSD extends FlowStateDataScopes>(
@@ -54,8 +54,6 @@ export const FlowToolbarEditLink = <FSD extends FlowStateDataScopes>(
                             if(!selectedElement) return
                             setTargetUrlInvalid(!e.currentTarget.reportValidity())
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
@@ -72,8 +70,6 @@ export const FlowToolbarEditLink = <FSD extends FlowStateDataScopes>(
                         onClick={() => {
                             if(!selectedElement) return
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
@@ -99,8 +95,6 @@ export const FlowToolbarEditLink = <FSD extends FlowStateDataScopes>(
                             if(!selectedElement) return
                             setIconUrlInvalid(!e.currentTarget.reportValidity())
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
@@ -118,14 +112,12 @@ export const FlowToolbarEditLink = <FSD extends FlowStateDataScopes>(
                         onClick={() => {
                             if(!selectedElement) return
                             updateView(
-                                // @ts-ignore
-                                selectedElement.type,
                                 selectedElement.id,
                                 (view) => ({
                                     ...view,
                                     link: {
                                         ...view.link || {},
-                                        target: undefined,
+                                        iconUrl: undefined,
                                     },
                                 }),
                             )

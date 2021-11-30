@@ -13,12 +13,6 @@ export const useResponsiveInput = (text: string, size: string = '16px'): UseResp
         const canvas = document.createElement('canvas')
         const context = canvas.getContext('2d')
         // @ts-ignore
-        //refInp?.current?.parentNode?.parentNode?.parentNode?.parentNode?.parentNode?.parentNode?.appendChild(canvas)
-        // @ts-ignore
-        //context.font = 'Roboto'
-        // @ts-ignore
-        //context.fontSize = '16px'
-        // @ts-ignore
         context.font = size + ' Roboto, Helvetica, Arial, sans-serif'
 
         // @ts-ignore
